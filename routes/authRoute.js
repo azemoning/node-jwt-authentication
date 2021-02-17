@@ -1,18 +1,18 @@
 const express = require('express')
+const { register, login } = require('../controllers/authController')
 const app = express.Router()
 
-app.get('/', async (req, res) => {
-    res.send()
+app.post('/register', async (req, res) => {
+    const { username, password } = req.body
+    const result = await register(username, password)
+    res.send(result)
 })
 
-app.post('/', async (req, res) => {
-    res.send()
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body
+    const result = await login(username, password)
+    res.send(result)
 })
 
-app.put('/:id', async (req, res) => {
-    res.send()
-})
 
-app.delete('/:id', async (req, res) => {
-    res.send()
-})
+module.exports = app

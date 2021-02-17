@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
 async function register(username, password) {
-    const encryptedPassword = bcrypt.hash(password, 5)
+    const encryptedPassword = await bcrypt.hash(password, 5)
     const id = nanoid()
     const payload = {
         id,
@@ -17,14 +17,16 @@ async function register(username, password) {
     })
 
     payload.token = jwt.sign({ id }, process.env.JWT_SECRET)
+
+    return payload
 }
 
 async function login(username, password) {
-    const user = Users.findOne({
+    const user = await Users.findOne({
         where: { username }
     })
 
-    if (bcrypt.compare(password, user.password)) {
+    if (await bcrypt.compare(password, user.password)) {
         const payload = {
             id: user.id,
             username: user.username,
