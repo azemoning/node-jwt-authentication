@@ -1,0 +1,44 @@
+const { Users } = require('../models')
+const { nanoid } = require('nanoid')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+
+async function register(username, password) {
+    const encryptedPassword = bcrypt.hash(password, 5)
+    const id = nanoid()
+    const payload = {
+        id,
+        username
+    }
+
+    await Users.create({
+        ...payload,
+        password: encryptedPassword
+    })
+
+    payload.token = jwt.sign({ id }, process.env.JWT_SECRET)
+}
+
+async function login(username, password) {
+    const user = Users.findOne({
+        where: { username }
+    })
+
+    if (bcrypt.compare(password, user.password)) {
+        const payload = {
+            id: user.id,
+            username: user.username,
+            token: jwt.sign({ id: user.id }, process.env.JWT_SECRET)
+        }
+        return payload
+    } else {
+        return {
+            message: 'invalid password'
+        }
+    }
+}
+
+module.exports = {
+    register,
+    login
+}
